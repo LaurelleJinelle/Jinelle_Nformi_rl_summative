@@ -1,4 +1,3 @@
-# plot_results_full.py
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,18 +6,12 @@ from stable_baselines3 import DQN, PPO
 from environment.custom_env import EnergyGridEnv
 import torch.nn as nn
 
-# ----------------------------
-# Paths to best models
-# ----------------------------
 best_dqn_model = "models/dqn/dqn_exp_10.zip"
 best_ppo_model = "models/ppo/ppo_exp_10.zip"
 best_reinforce_model = "models/reinforce/reinforce_exp_7.pt"
 plots_dir = "plots"
 os.makedirs(plots_dir, exist_ok=True)
 
-# ----------------------------
-# Policy Network for REINFORCE
-# ----------------------------
 class PolicyNetwork(nn.Module):
     def __init__(self, obs_size, n_actions):
         super().__init__()
@@ -31,9 +24,6 @@ class PolicyNetwork(nn.Module):
         x = torch.relu(self.fc2(x))
         return torch.softmax(self.fc3(x), dim=-1)
 
-# ----------------------------
-# Test functions
-# ----------------------------
 def test_dqn(model_path, steps=100):
     env = EnergyGridEnv()
     model = DQN.load(model_path)
@@ -71,10 +61,7 @@ def test_ppo(model_path, steps=100):
     return rewards, entropy_vals
 
 def test_reinforce(model_path, steps=50, n_runs=5):
-    """
-    Test the REINFORCE model with proper stochastic action selection.
-    Returns average rewards and entropy values over multiple runs.
-    """
+
     env = EnergyGridEnv()
     obs_size = env.observation_space.shape[0]
     n_actions = env.action_space.n
@@ -120,9 +107,6 @@ def test_reinforce(model_path, steps=50, n_runs=5):
 
     return avg_rewards, avg_entropy
 
-# ----------------------------
-# Generalization test
-# ----------------------------
 def test_generalization(model_type, model_path, runs=5, steps=100):
     all_rewards = []
     for _ in range(runs):
@@ -135,16 +119,11 @@ def test_generalization(model_type, model_path, runs=5, steps=100):
         all_rewards.append(np.sum(rewards))
     return all_rewards
 
-# ----------------------------
-# Run tests
-# ----------------------------
 dqn_rewards, dqn_losses = test_dqn(best_dqn_model)
 ppo_rewards, ppo_entropy = test_ppo(best_ppo_model)
 reinforce_rewards, reinforce_entropy = test_reinforce(best_reinforce_model)
 
-# ----------------------------
 # Plot cumulative rewards subplots
-# ----------------------------
 fig, axs = plt.subplots(3, 1, figsize=(12, 12))
 axs[0].plot(np.cumsum(dqn_rewards))
 axs[0].set_title("DQN Cumulative Rewards")
@@ -165,9 +144,7 @@ plt.tight_layout()
 plt.savefig(os.path.join(plots_dir, "cumulative_rewards_subplots.png"))
 plt.close()
 
-# ----------------------------
 # DQN loss curve
-# ----------------------------
 plt.figure(figsize=(10,6))
 plt.plot(dqn_losses)
 plt.title("DQN TD Variance (Approx. Loss)")
@@ -176,9 +153,7 @@ plt.ylabel("Loss")
 plt.savefig(os.path.join(plots_dir, "dqn_loss_curve.png"))
 plt.close()
 
-# ----------------------------
 # Policy entropy curves
-# ----------------------------
 plt.figure(figsize=(10,6))
 plt.plot(ppo_entropy, label="PPO")
 plt.plot(reinforce_entropy, label="REINFORCE")
@@ -189,9 +164,7 @@ plt.legend()
 plt.savefig(os.path.join(plots_dir, "policy_entropy_curve.png"))
 plt.close()
 
-# ----------------------------
 # Episodes to converge (moving average)
-# ----------------------------
 def moving_average(x, w=10):
     return np.convolve(x, np.ones(w)/w, mode='valid')
 
@@ -206,9 +179,7 @@ plt.legend()
 plt.savefig(os.path.join(plots_dir, "episodes_to_converge.png"))
 plt.close()
 
-# ----------------------------
 # Generalization plots
-# ----------------------------
 dqn_gen = test_generalization("DQN", best_dqn_model)
 ppo_gen = test_generalization("PPO", best_ppo_model)
 reinforce_gen = test_generalization("REINFORCE", best_reinforce_model)

@@ -8,7 +8,6 @@ import os
 class EnergyGridEnv(gym.Env):
     """
     Smart Energy Grid Environment
-    5 regions visualized as a mini-city map with buildings, trees, roads
     """
     metadata = {"render_modes": ["human"]}
 
@@ -40,9 +39,6 @@ class EnergyGridEnv(gym.Env):
         self.render_initialized = False
         self.reset()
 
-    # ----------------------------------
-    # Reset
-    # ----------------------------------
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
         self.current_step = 0
@@ -50,9 +46,6 @@ class EnergyGridEnv(gym.Env):
         self.allocation = np.ones(self.num_regions) * (self.total_supply / self.num_regions)
         return self._get_obs(), {}
 
-    # ----------------------------------
-    # Step
-    # ----------------------------------
     def step(self, action):
         self.current_step += 1
         self._apply_action(action)
@@ -62,9 +55,6 @@ class EnergyGridEnv(gym.Env):
         truncated = self.current_step >= self.max_steps
         return self._get_obs(), reward, terminated, truncated, {}
 
-    # ----------------------------------
-    # Apply action
-    # ----------------------------------
     def _apply_action(self, action):
         adjustment = self.total_supply * 0.1
         if action < self.num_regions:
@@ -80,9 +70,6 @@ class EnergyGridEnv(gym.Env):
         if total_alloc > self.total_supply:
             self.allocation = (self.allocation / total_alloc) * self.total_supply
 
-    # ----------------------------------
-    # Update demand
-    # ----------------------------------
     def _update_demand(self):
         fluctuation = np.random.randint(-5,6, size=self.num_regions)
         self.demand += fluctuation
@@ -93,9 +80,6 @@ class EnergyGridEnv(gym.Env):
             spike_region = np.random.randint(0,self.num_regions)
             self.demand[spike_region] += 30
 
-    # ----------------------------------
-    # Reward
-    # ----------------------------------
     def _calculate_reward(self):
         reward = 0
         served = np.minimum(self.allocation, self.demand)
@@ -109,9 +93,6 @@ class EnergyGridEnv(gym.Env):
         reward -= fluctuation_penalty
         return float(reward)
 
-    # ----------------------------------
-    # Observation
-    # ----------------------------------
     def _get_obs(self):
         return np.concatenate([
             self.demand,
@@ -120,9 +101,6 @@ class EnergyGridEnv(gym.Env):
             [self.total_supply, self.current_step]
         ]).astype(np.float32)
 
-    # ----------------------------------
-    # Render with mini-city map
-    # ----------------------------------
     def render(self):
         if not self.render_initialized:
             pygame.init()
@@ -190,9 +168,6 @@ class EnergyGridEnv(gym.Env):
 
         pygame.display.flip()
 
-    # ----------------------------------
-    # Close
-    # ----------------------------------
     def close(self):
         if self.render_initialized:
             pygame.quit()

@@ -6,15 +6,9 @@ from stable_baselines3 import PPO
 from stable_baselines3.common.monitor import Monitor
 from environment.custom_env import EnergyGridEnv
 
-# ----------------------------
-# Create directories for models and logs
-# ----------------------------
 os.makedirs("models/ppo", exist_ok=True)
 os.makedirs("logs/ppo", exist_ok=True)
 
-# ----------------------------
-# Define 10 hyperparameter sets for PPO
-# ----------------------------
 hyperparameter_sets = [
     {"learning_rate": 3e-4, "gamma": 0.99, "n_steps": 128, "ent_coef": 0.0, "batch_size": 64},
     {"learning_rate": 1e-3, "gamma": 0.99, "n_steps": 256, "ent_coef": 0.01, "batch_size": 64},
@@ -30,9 +24,6 @@ hyperparameter_sets = [
 
 TIMESTEPS = 200000
 
-# ----------------------------
-# Run experiments
-# ----------------------------
 for i, params in enumerate(hyperparameter_sets, start=1):
     print(f"\n===== PPO Experiment {i} =====")
     print(f"Hyperparameters: {params}")

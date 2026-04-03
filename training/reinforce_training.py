@@ -7,15 +7,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from environment.custom_env import EnergyGridEnv
 
-# ----------------------------
-# Create directories
-# ----------------------------
 os.makedirs("models/reinforce", exist_ok=True)
 os.makedirs("logs/reinforce", exist_ok=True)
 
-# ----------------------------
-# Policy network
-# ----------------------------
 class PolicyNetwork(nn.Module):
     def __init__(self, obs_size, n_actions):
         super().__init__()
@@ -28,9 +22,6 @@ class PolicyNetwork(nn.Module):
         x = torch.relu(self.fc2(x))
         return torch.softmax(self.fc3(x), dim=-1)
 
-# ----------------------------
-# Hyperparameter sets for REINFORCE
-# ----------------------------
 hyperparameter_sets = [
     {"lr": 1e-3, "gamma": 0.99, "entropy_coef": 0.01},
     {"lr": 5e-4, "gamma": 0.99, "entropy_coef": 0.01},
@@ -44,11 +35,8 @@ hyperparameter_sets = [
     {"lr": 5e-4, "gamma": 0.99, "entropy_coef": 0.01},
 ]
 
-TIMESTEPS = 1500  # Reduce for testing; increase later
+TIMESTEPS = 1500
 
-# ----------------------------
-# Run experiments
-# ----------------------------
 for i, params in enumerate(hyperparameter_sets, start=1):
     print(f"\n===== REINFORCE Experiment {i} =====")
     print(f"Hyperparameters: {params}")
